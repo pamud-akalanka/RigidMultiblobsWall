@@ -173,11 +173,24 @@ def calc_one_blob_forces(r_vectors, *args, **kwargs):
     Nblobs = int(r_vectors.size / 3)
     force_blobs = np.zeros((Nblobs, 3))
     r_vectors = np.reshape(r_vectors, (Nblobs, 3))
+    k =  5 #specify spring constant
+    fix_index = kwargs.get('fix_index') 
+    r0 = kwargs.get('r0')
+
 
     # Loop over blobs
     for blob in range(Nblobs):
         force_blobs[blob] += blob_external_force(
             r_vectors[blob], *args, **kwargs)
+        
+        
+        #put condition to add spring to immobile blobs that make rigid structure
+
+        if blob >= fix_index:
+            force_blobs[blob] += -k * (r_vectors[blob]- r0[blob - fix_index]) #fix in place
+            
+        
+    #put a condition here for fixed blobs -akalanka
 
     return force_blobs
 

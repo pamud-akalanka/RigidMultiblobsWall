@@ -56,10 +56,10 @@ class Lub_Solver(object):
         self.Delta_R_cut_wall = None
 
         # if domain is a 'single_wall'
-        self.mobility_trans_times_force_wall = mob.single_wall_mobility_trans_times_force_pycuda  # pycuda
-        self.mobility_trans_times_torque_wall = mob.single_wall_mobility_trans_times_torque_pycuda  # pycuda
-        self.mobility_rot_times_force_wall = mob.single_wall_mobility_rot_times_force_pycuda  # pycuda
-        self.mobility_rot_times_torque_wall = mob.single_wall_mobility_rot_times_torque_pycuda  # pycuda
+        self.mobility_trans_times_force_wall = mob.single_wall_mobility_trans_times_force_numba  # pycuda
+        self.mobility_trans_times_torque_wall = mob.single_wall_mobility_trans_times_torque_numba  # pycuda
+        self.mobility_rot_times_force_wall = mob.single_wall_mobility_rot_times_force_numba  # pycuda
+        self.mobility_rot_times_torque_wall = mob.single_wall_mobility_rot_times_torque_numba  # pycuda
         # if domain is a 'no_wall'
         self.mobility_trans_times_force = mob.no_wall_mobility_trans_times_force_pycuda  # pycuda
         self.mobility_trans_times_torque = mob.no_wall_mobility_trans_times_torque_pycuda  # pycuda
@@ -920,7 +920,7 @@ class Lub_Solver(object):
 
         Om0 = np.zeros(6*len(self.bodies))
         for i in range(len(self.bodies)):
-            Om0[6*i+4] = Om
+            Om0[6*i+4] = Om[i] #omega should be a vector 
         F0 = np.concatenate((F, np.zeros(F.shape)), axis=1)
         F0 = F0.flatten()
         RHS = self.IpMDR_Mult(
@@ -968,7 +968,7 @@ class Lub_Solver(object):
 
         # use 8*pi*eta*a^3*Omega as initial guess for torque
         Om_g = np.zeros((len(self.bodies), 3))
-        Om_g[:, 1] += Om
+        Om_g[:, 1] += Om[i] # akalanka - changes this line
         T_g = c2*Om_g
         V_g = 0*T_g
         X0_vt = np.concatenate((V_g, T_g), axis=1).flatten()

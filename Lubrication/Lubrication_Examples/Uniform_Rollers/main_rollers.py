@@ -158,7 +158,25 @@ if __name__ == '__main__':
     dt1 = time.time() - t0
     print(("Make R mats time : %s" % dt1))
 
-    Omega = 9.0*2.0*np.pi
+
+
+
+    # distinguish between mobile/imobile particles
+    r_vecs_initial = np.array([1.0* b.location for b in bodies]) #all blobs
+    fix_index = 1 #first index for rigid body
+    r0 = 1.0*r_vecs_initial[fix_index::,:] #choose only immobile blobs
+
+
+    # rotate only the roller with constant omega
+    # blobs in structures do not rotate
+    Omega =[]
+
+    for index in range(num_particles):
+        if index < fix_index:  
+            Omega.append(9.0*2.0*np.pi) # specify omega as a vector
+        else:
+            Omega.append(0) 
+
 
     total_rej = 0
     for n in range(n_steps):
@@ -176,20 +194,23 @@ if __name__ == '__main__':
                           periodic_length=L,
                           omega=0,  # Omega ############## CHANGE ME TO ZERO FOR CONST OMEGA AND TO 'Omega' FOR CONST TORQUE
                           eta=eta,
+                          fix_index=fix_index,
+                          r0=r0,
                           a=a)
 
-        Torque_Lim = 1.9904
+        # Update roller with const. omega but limit torque/ hard cutoff
+        #Torque_Lim = 1.9904
+        #Output_Vel = True
+        #t0 = time.time()
+        #reject_wall, reject_jump, Trap_vel_t = LSolv.Update_Bodies_Trap(
+            #FT_calc, Omega=Omega, Out_Torque=Output_Vel, Cut_Torque=Torque_Lim)
+        #dt1 = time.time() - t0
+
+        #Update rollers with const. omega and no torque limitaion
         Output_Vel = True
         t0 = time.time()
-        reject_wall, reject_jump, Trap_vel_t = LSolv.Update_Bodies_Trap(
-            FT_calc, Omega=Omega, Out_Torque=Output_Vel, Cut_Torque=Torque_Lim)
+        reject_wall, reject_jump, Trap_vel_t = LSolv.Update_Bodies_Trap(FT_calc,Omega=Omega,Out_Torque=Output_Vel)
         dt1 = time.time() - t0
-
-        # Update rollers with const. omega and no torque limitaion
-        #Output_Vel = False
-        #t0 = time.time()
-        #reject_wall, reject_jump = LSolv.Update_Bodies_Trap(FT_calc,Omega=Omega)
-        #dt1 = time.time() - t0
 
         # Update rollers with const. torque (ALSO MAKE CHANGE ON LINE 169 in FT_calc)
         #Output_Vel = False

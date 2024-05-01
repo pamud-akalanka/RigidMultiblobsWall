@@ -1,13 +1,13 @@
 # Select implementation to compute M and M*f
 mobility_blobs_implementation            C++
-mobility_vector_prod_implementation      pycuda
+mobility_vector_prod_implementation      numba
 
 # Select implementation to compute the blobs-blob interactions
 blob_blob_force_implementation           python
 
 # Set time step, number of steps and save frequency
-dt                                       0.01
-n_steps                                  2500
+dt                                       0.001
+n_steps                                  25000
 n_save                                   1
 
 # Set fluid viscosity (eta), gravity (g) and blob radius
@@ -37,8 +37,8 @@ firm_delta                               1e-2
 seed					 1
 
 # Set output name
-output_name                              ./data/Experimental_2048_dt_01_9_Hz_Torque_Lim
+output_name                              ./data/RampandRoller
 
 # Load rigid bodies configuration, provide
 # *.vertex and *.clones files
-structure ./blob.vertex ./big_a_8kt_experiment_hard_phi_0.4_n_2048_eq.clones 
+structure ./blob.vertex ./rampAndRoller.clones 
